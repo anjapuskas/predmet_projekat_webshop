@@ -8,6 +8,7 @@ import DeliveredOrdersListPage from "pages/DeliveredOrdersListPage";
 import EditProductPage from "pages/EditProductPage";
 import HomePage from "pages/HomePage";
 import LoginPage from "pages/LoginPage";
+import MapPage from "pages/MapPage";
 import NewOrdersListPage from "pages/NewOrdersListPage";
 import OrderDetailsPage from "pages/OrderDetailsPage";
 import OrdersListPage from "pages/OrdersListPage";
@@ -68,6 +69,9 @@ const AppRoutes = () => {
                 )}
                 {isSeller && (
                   <Route path="/order-details" element={<OrderDetailsPage />} />
+                )}
+                {isSeller && (
+                  <Route path="/map" element={<MapPage />} />
                 )}
                 {isAdmin && (
                   <Route path="/admin-orders" element={<AdminOrdersListPage />} />

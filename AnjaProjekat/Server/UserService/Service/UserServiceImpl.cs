@@ -39,7 +39,7 @@ namespace UserService.Service
                 throw new CredentialsException("User does not exist");
             }
 
-            if (user.UserRole == UserRole.SELLER && user.UserStatus == UserStatus.ON_HOLD)
+            if (user.UserRole == UserRole.SELLER && user.UserStatus != UserStatus.VERIFIED)
             {
                 throw new CredentialsException("User is not verified. Please wait from verification from Admin.");
             }
@@ -118,17 +118,16 @@ namespace UserService.Service
 
             List<Claim> claims = new List<Claim>
             {
-                new Claim("id", user.Id.ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.UserRole.ToString())
             };
-            SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("Jwt")["secret"]));
+
+            SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("ApplicationSettings")["secret"]));
 
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var tokenOptions = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
+                issuer: "https://localhost:44350/",
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(20),
                 signingCredentials: signinCredentials

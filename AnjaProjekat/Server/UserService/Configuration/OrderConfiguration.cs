@@ -10,6 +10,7 @@ namespace UserService.Configuration
         {
             builder.HasKey(order => order.Id);
             builder.Property(order => order.Id).ValueGeneratedOnAdd();
+            builder.Property(user => user.DeliveryTime).IsRequired(false);
             builder.HasMany(x => x.OrderProducts)
                               .WithOne(x => x.Order)
                               .OnDelete(DeleteBehavior.Cascade);

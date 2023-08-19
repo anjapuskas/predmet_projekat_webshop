@@ -30,8 +30,9 @@ namespace UserService.Service
             Order order = _mapper.Map<Order>(createOrderDTO);
             order.Buyer = await _userService.getUser(order.UserId);
             order.Created = DateTime.Now;
-            order.DeliveryTime = DateTime.Now.AddHours(1).AddHours(new Random().Next(24));
+//            order.DeliveryTime = DateTime.Now.AddHours(1).AddHours(new Random().Next(24));
             order.OrderProducts = new List<OrderProduct>();
+            order.Approved = false;
             List<long> differentSellerIds = new List<long>();
 
             foreach (ProductDTO product in createOrderDTO.Products)
@@ -44,12 +45,12 @@ namespace UserService.Service
                 orderProduct.Price = product.Price;
                 orderProduct.Amount = product.Amount;
 
-                if(orderProduct.Product.Amount < product.Amount)
+                if (orderProduct.Product.Amount < product.Amount)
                 {
                     throw new Exception("Nedovoljno kolicine za proizvod " + product.Name);
                 }
                 orderProduct.Product.Amount = orderProduct.Product.Amount - product.Amount;
-                if(!differentSellerIds.Contains(orderProduct.Product.SellerId))
+                if (!differentSellerIds.Contains(orderProduct.Product.SellerId))
                 {
                     differentSellerIds.Add(orderProduct.Product.SellerId);
                 }
@@ -57,13 +58,47 @@ namespace UserService.Service
                 order.OrderProducts.Add(orderProduct);
             }
 
-            order.Price = order.Price + differentSellerIds.Count*10.0;
+            order.Price = order.Price + differentSellerIds.Count * 10.0;
             await _repository._orderRepository.Insert(order);
             await _repository.SaveChanges();
 
 
 
             return true;
+        }
+
+        public async Task<List<OrderDTO>> approveOrder(long id, ClaimsPrincipal claimsPrincipal)
+        {
+            var userIdClaim = claimsPrincipal.Claims.First(c => c.Type == "id").Value;
+
+            if (userIdClaim == null)
+            {
+                throw new Exception("Try logging in again");
+            }
+
+            if (!long.TryParse(userIdClaim, out long userId))
+            {
+                throw new Exception("Id must be a number.");
+            }
+
+            User user = await _userService.getUser(userId);
+
+            if (user.UserRole == UserRole.SELLER && user.UserStatus != UserStatus.VERIFIED)
+            {
+
+                throw new Exception("User is not verified");
+
+            }
+
+            Order order = await _repository._orderRepository.Get(id);
+            order.DeliveryTime = DateTime.Now.AddHours(new Random().Next(24));
+            order.Approved = true;
+            _repository._orderRepository.Update(order);
+            await _repository.SaveChanges();
+
+
+
+            return await getSellerOrders(OrderStatus.ORDERED, claimsPrincipal);
         }
 
         public async Task<List<OrderDTO>> getAllBuyerOrders(long id)
@@ -76,7 +111,9 @@ namespace UserService.Service
                 OrderDTO orderDTO = _mapper.Map<OrderDTO>(order);
                 orderDTO.OrderStatus = Enum.GetName(typeof(OrderStatus), order.OrderStatus);
                 orderDTO.Created = order.Created.ToString("yyyy.MM.dd HH:mm:ss");
-                orderDTO.DeliveryTime = order.DeliveryTime.ToString("yyyy.MM.dd HH:mm:ss");
+                if(order.DeliveryTime != null)
+
+                orderDTO.DeliveryTime = order.DeliveryTime?.ToString("yyyy.MM.dd HH:mm:ss");
                 orderDTOs.Add(orderDTO);
             }
 
@@ -115,7 +152,7 @@ namespace UserService.Service
                 OrderDTO orderDTO = _mapper.Map<OrderDTO>(order);
                 orderDTO.OrderStatus = Enum.GetName(typeof(OrderStatus), order.OrderStatus);
                 orderDTO.Created = order.Created.ToString("yyyy.MM.dd HH:mm:ss");
-                orderDTO.DeliveryTime = order.DeliveryTime.ToString("yyyy.MM.dd HH:mm:ss");
+                orderDTO.DeliveryTime = order.DeliveryTime?.ToString("yyyy.MM.dd HH:mm:ss");
                 var orderProducts = await _repository._orderProductRepository.GetAll();
                 List<OrderProduct> orderProductList = orderProducts.Where(o => o.OrderId == order.Id).ToList();
                 bool containsProduct = false;
@@ -127,7 +164,7 @@ namespace UserService.Service
                         containsProduct = true;
                         price += product.Price * orderProduct.Amount;
                     }
-                    
+
                 }
                 if(containsProduct)
                 {
@@ -150,7 +187,7 @@ namespace UserService.Service
                 OrderDTO orderDTO = _mapper.Map<OrderDTO>(order);
                 orderDTO.OrderStatus = Enum.GetName(typeof(OrderStatus), order.OrderStatus);
                 orderDTO.Created = order.Created.ToString("yyyy.MM.dd HH:mm:ss");
-                orderDTO.DeliveryTime = order.DeliveryTime.ToString("yyyy.MM.dd HH:mm:ss");
+                orderDTO.DeliveryTime = order.DeliveryTime?.ToString("yyyy.MM.dd HH:mm:ss");
                 orderDTOs.Add(orderDTO);
             }
 

@@ -5,7 +5,6 @@ import { Button, Container, CssBaseline, Grid, Paper, Table, TableBody, TableCel
 
 import Navigation from 'components/Navigation/Navigation';
 import { cancelOrder, getAllOrdersAction } from 'slices/orderSlice';
-import CountdownTimer from 'components/Shared/CountdownTimer';
 
 const OrdersListForm = () => {
   const dispatch = useDispatch();
@@ -37,10 +36,10 @@ const OrdersListForm = () => {
           <TableRow>
             <TableCell>Address</TableCell>
             <TableCell>Created Date</TableCell>
+            <TableCell>Delivery Date</TableCell>
             <TableCell>Order Status</TableCell>
             <TableCell>Price</TableCell>
             <TableCell>Action</TableCell>
-            <TableCell>Delivery Date</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -48,6 +47,7 @@ const OrdersListForm = () => {
             <TableRow key={order.id}>
               <TableCell>{order.address}</TableCell>
               <TableCell>{order.created}</TableCell>
+              <TableCell>{order.deliveryTime}</TableCell>
               <TableCell>{order.orderStatus}</TableCell>
               <TableCell>{order.price}</TableCell>
               <TableCell>
@@ -55,11 +55,7 @@ const OrdersListForm = () => {
                   Cancel
                 </Button>
               </TableCell>
-              {order.orderStatus === 'ORDERED' ? (
-              <CountdownTimer deliveryTime={order.deliveryTime} />
-              ) : (
-                <TableCell>{order.deliveryTime}</TableCell>
-                )}            </TableRow>
+            </TableRow>
           ))}
         </TableBody>
       </Table>

@@ -8,7 +8,6 @@ import Navigation from 'components/Navigation/Navigation';
 import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 
-
 const AddProductForm = () => {
   const [productName, setProductName] = useState('');
   const [price, setPrice] = useState('');

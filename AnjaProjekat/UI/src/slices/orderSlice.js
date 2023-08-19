@@ -1,12 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Product from "models/Product";
 import { toast } from "react-toastify";
-import { AddOrder, CancelOrder, GetAdminOrders, GetAllOrders, GetDeliveredOrders, GetNewOrders, GetProductsForOrder } from "services/OrderService";
+import Geocode from "react-geocode";
+import { AddOrder, ApproveOrderAction as ApproveOrder, CancelOrder, GetAdminOrders, GetAllOrders, GetDeliveredOrders, GetNewOrders, GetProductsForOrder } from "services/OrderService";
 
 
 const initialState = {
   orders : [],
-  orderProducts: []
+  orderProducts: [],
+  markersData: []
 };
   
   export const addOrderAction = createAsyncThunk(
@@ -88,6 +90,41 @@ const initialState = {
       try {
         const response = await GetProductsForOrder(data);
         return thunkApi.fulfillWithValue(response);
+      } catch (error) {
+        return thunkApi.rejectWithValue(error.message);
+      }
+    }
+  );
+
+  export const approveOrderAction = createAsyncThunk(
+    "orders/approve",
+    async (data, thunkApi) => {
+      try {
+        const response = await ApproveOrder(data);
+        return thunkApi.fulfillWithValue(response);
+      } catch (error) {
+        return thunkApi.rejectWithValue(error.message);
+      }
+    }
+  );
+
+  export const ordersMapAction = createAsyncThunk(
+    "orders/map",
+    async (data, thunkApi) => {
+      try {
+        const orders = await GetNewOrders();
+        const markersData = [];
+        for (const o of orders) {
+          try {
+            const response = await Geocode.fromAddress(o.address);
+            const { lat, lng } = response.results[0].geometry.location;
+            markersData.push({lat: lat, lon: lng, price:o.price.toFixed(2), id:o.id, address:o.address, comment: o.comment, approved: o.approved});
+          } catch (error) {
+            console.log(error);
+          }
+
+        }
+        return thunkApi.fulfillWithValue(markersData);
       } catch (error) {
         return thunkApi.rejectWithValue(error.message);
       }
@@ -195,11 +232,36 @@ const initialState = {
             pauseOnHover: false,
           });
         });
+        builder.addCase(approveOrderAction.fulfilled, (state, action) => {
+          toast.success("The order has been approved", {
+            position: "top-center",
+            autoClose: 2500,
+            closeOnClick: true,
+            pauseOnHover: false,
+          });
+          state.orders = action.payload;
+        });
+        builder.addCase(approveOrderAction.rejected, (state, action) => {
+          let error = ""; 
+          if (typeof action.payload === "string") {
+            error = action.payload;
+          }
+    
+          toast.error(error, {
+            position: "top-center",
+            autoClose: 2500,
+            closeOnClick: true,
+            pauseOnHover: false,
+          });
+        });
+
+        builder.addCase(ordersMapAction.fulfilled, (state, action) => {
+          state.markersData = action.payload;
+        });
     }
     
 });
 
 export const { removeOrders } = orderSlice.actions;
-
 
 export default orderSlice.reducer;

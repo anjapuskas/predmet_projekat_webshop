@@ -11,6 +11,5 @@ namespace UserService.DTO
         public string Description { get; set; }
         public byte[]? Picture { get; set; }
         public long SellerId { get; set; }
-
     }
 }

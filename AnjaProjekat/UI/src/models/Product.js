@@ -6,7 +6,7 @@ export class Product {
         this.amount = product.amount;
         this.price = product.price;
         this.picture = product.picture
-        this.sellerId = product.sellerId
+        this.sellerId = this.sellerId
     }
 }
 export default Product;
