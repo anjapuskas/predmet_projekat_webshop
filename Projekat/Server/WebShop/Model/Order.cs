@@ -6,12 +6,11 @@
         public string Comment { get; set; } 
         public string Address { get; set; }
         public DateTime Created { get; set; }
-        public DateTime DeliveryTime { get; set; }
+        public DateTime? DeliveryTime { get; set; }
         public OrderStatus OrderStatus { get; set; }
         public List<OrderProduct> OrderProducts { get; set; }
         public User Buyer { get; set; }
         public int UserId { get; set; }
-
-
+        public bool Approved { get; set; }
     }
 }

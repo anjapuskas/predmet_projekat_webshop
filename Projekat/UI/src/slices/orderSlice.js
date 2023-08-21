@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Product from "models/Product";
 import { toast } from "react-toastify";
-import { AddOrder, CancelOrder, GetAdminOrders, GetAllOrders, GetDeliveredOrders, GetNewOrders, GetProductsForOrder } from "services/OrderService";
+import { AddOrder, ApproveOrderAction, CancelOrder, GetAdminOrders, GetAllOrders, GetDeliveredOrders, GetNewOrders, GetProductsForOrder } from "services/OrderService";
 
 
 const initialState = {
@@ -87,6 +87,18 @@ const initialState = {
     async (data, thunkApi) => {
       try {
         const response = await GetProductsForOrder(data);
+        return thunkApi.fulfillWithValue(response);
+      } catch (error) {
+        return thunkApi.rejectWithValue(error.message);
+      }
+    }
+  );
+
+  export const approveOrderAction = createAsyncThunk(
+    "orders/approve",
+    async (data, thunkApi) => {
+      try {
+        const response = await ApproveOrderAction(data);
         return thunkApi.fulfillWithValue(response);
       } catch (error) {
         return thunkApi.rejectWithValue(error.message);
@@ -195,6 +207,28 @@ const initialState = {
             pauseOnHover: false,
           });
         });
+        builder.addCase(approveOrderAction.fulfilled, (state, action) => {
+          toast.success("The order has been approved", {
+            position: "top-center",
+            autoClose: 2500,
+            closeOnClick: true,
+            pauseOnHover: false,
+          });
+          state.orders = action.payload;
+        });
+        builder.addCase(approveOrderAction.rejected, (state, action) => {
+          let error = ""; 
+          if (typeof action.payload === "string") {
+            error = action.payload;
+          }
+
+          toast.error(error, {
+            position: "top-center",
+            autoClose: 2500,
+            closeOnClick: true,
+            pauseOnHover: false,
+          });
+        });
     }
     
 });
@@ -203,3 +237,4 @@ export const { removeOrders } = orderSlice.actions;
 
 
 export default orderSlice.reducer;
+

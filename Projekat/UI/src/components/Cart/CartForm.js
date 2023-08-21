@@ -53,16 +53,6 @@ const CartForm = () => {
         userId: id
       };
 
-      if(paymentMethod === 'Card') {
-        toast.error('Please pay using paypal first', {
-          position: 'top-center',
-          autoClose: 3000,
-          closeOnClick: true,
-          pauseOnHover: false,
-        });
-        return;
-      }
-
       if(!address) {
         toast.error('Please add a address', {
           position: 'top-center',
@@ -247,7 +237,7 @@ const CartForm = () => {
                       />
                     </PayPalScriptProvider>
                   )}
-                    <Button variant="contained" type="submit" color="primary" className={styles.button} fullWidth>
+                    <Button disabled={paymentMethod === 'Card'} variant="contained" type="submit" color="primary" className={styles.button} fullWidth>
                         Proceed to Checkout
                     </Button>
                     </Card>

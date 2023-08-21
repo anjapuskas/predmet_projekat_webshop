@@ -73,5 +73,13 @@ namespace WebShop.Configuration
             List<ProductItemDTO> products = await _orderService.getProductsForOrder(id, User);
             return Ok(products);
         }
+
+        [HttpPost("approve/{id}")]
+        [Authorize(Roles = "SELLER")]
+        public async Task<IActionResult> approveOrder(long id)
+        {
+            List<OrderDTO> orders = await _orderService.approveOrder(id, User);
+            return Ok(orders);
+        }
     }
 }

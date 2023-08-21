@@ -16,5 +16,7 @@ namespace WebShop.Service.Interface
 
         Task<List<OrderDTO>> cancelOrder(long id, ClaimsPrincipal claimsPrincipal);
         Task<List<ProductItemDTO>> getProductsForOrder(long id, System.Security.Claims.ClaimsPrincipal user);
+        Task<List<OrderDTO>> approveOrder(long id, ClaimsPrincipal claimsPrincipal);
+
     }
 }

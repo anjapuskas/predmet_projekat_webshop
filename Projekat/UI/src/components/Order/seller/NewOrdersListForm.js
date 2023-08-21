@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Container, CssBaseline, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 
 import Navigation from 'components/Navigation/Navigation';
-import { cancelOrder, getAllOrdersAction, getNewOrdersAction } from 'slices/orderSlice';
+import { approveOrderAction, cancelOrder, getAllOrdersAction, getNewOrdersAction } from 'slices/orderSlice';
 import { useNavigate } from 'react-router';
 import CountdownTimer from 'components/Shared/CountdownTimer';
 
@@ -27,6 +27,14 @@ const NewOrdersListForm = () => {
     navigate('/order-details', { state: { orderId: orderId } });
   };
 
+  const handleApprove = (orderId) => {
+
+    
+    // @ts-ignore
+    dispatch(approveOrderAction(orderId));
+    window.location.reload();
+  };
+
   return (
     <>
     <Navigation/>
@@ -39,6 +47,7 @@ const NewOrdersListForm = () => {
             <TableCell>Address</TableCell>
             <TableCell>Created Date</TableCell>
             <TableCell>Price</TableCell>
+            <TableCell>Approved</TableCell>
             <TableCell>Actions</TableCell>
             <TableCell>Delivery Time</TableCell>
           </TableRow>
@@ -50,7 +59,12 @@ const NewOrdersListForm = () => {
               <TableCell>{order.address}</TableCell>
               <TableCell>{order.created}</TableCell>
               <TableCell>{order.price}</TableCell>
+              <TableCell>{order.approved ? "Yes" : "No"}</TableCell>
               <TableCell>
+              {!order.approved && (<Button variant="outlined" color="secondary" onClick={() => handleApprove(order.id)}>
+                  Approve
+                </Button>     
+              )} 
                 <Button variant="outlined" color="secondary" onClick={() => handleDetails(order.id)}>
                   Details
                 </Button>                

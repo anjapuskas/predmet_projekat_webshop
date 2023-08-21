@@ -11,5 +11,7 @@ namespace WebShop.DTO
         public string DeliveryTime { get; set; }
         public string OrderStatus { get; set; }
         public long UserId { get; set; }
+        public bool Approved { get; set; }
+
     }
 }

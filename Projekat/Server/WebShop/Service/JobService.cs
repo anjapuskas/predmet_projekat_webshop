@@ -19,7 +19,7 @@ namespace WebShop.Service
 
                     // Pronađite porudžbine koje treba ažurirati
                     var orders = dbContext.Order
-                        .Where(o => o.OrderStatus == Model.OrderStatus.ORDERED && o.DeliveryTime <= DateTime.Now)
+                        .Where(o => o.OrderStatus == Model.OrderStatus.ORDERED && o.DeliveryTime!=null && o.DeliveryTime <= DateTime.Now)
                         .ToList();
 
                     // Ažurirajte status porudžbina

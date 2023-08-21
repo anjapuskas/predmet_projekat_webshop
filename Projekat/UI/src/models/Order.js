@@ -6,6 +6,7 @@ export class Order {
         this.deliveryTime = order.deliveryTime;
         this.orderStatus = order.orderStatus;
         this.price = order.price;
+        this.approved = order.approved;
     }
 }
 export default Order;
