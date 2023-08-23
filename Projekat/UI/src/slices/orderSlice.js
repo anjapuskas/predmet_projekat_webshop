@@ -2,11 +2,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Product from "models/Product";
 import { toast } from "react-toastify";
 import { AddOrder, ApproveOrderAction, CancelOrder, GetAdminOrders, GetAllOrders, GetDeliveredOrders, GetNewOrders, GetProductsForOrder } from "services/OrderService";
+import Geocode from "react-geocode";
 
 
 const initialState = {
   orders : [],
-  orderProducts: []
+  orderProducts: [],
+  markersData: []
 };
   
   export const addOrderAction = createAsyncThunk(
@@ -100,6 +102,29 @@ const initialState = {
       try {
         const response = await ApproveOrderAction(data);
         return thunkApi.fulfillWithValue(response);
+      } catch (error) {
+        return thunkApi.rejectWithValue(error.message);
+      }
+    }
+  );
+
+  export const ordersMapAction = createAsyncThunk(
+    "orders/map",
+    async (data, thunkApi) => {
+      try {
+        const orders = await GetNewOrders();
+        const markersData = [];
+        for (const o of orders) {
+          try {
+            const response = await Geocode.fromAddress(o.address);
+            const { lat, lng } = response.results[0].geometry.location;
+            markersData.push({lat: lat, lon: lng, price:o.price.toFixed(2), id:o.id, address:o.address, comment: o.comment, approved: o.approved});
+          } catch (error) {
+            console.log(error);
+          }
+
+        }
+        return thunkApi.fulfillWithValue(markersData);
       } catch (error) {
         return thunkApi.rejectWithValue(error.message);
       }
@@ -228,6 +253,9 @@ const initialState = {
             closeOnClick: true,
             pauseOnHover: false,
           });
+        });
+        builder.addCase(ordersMapAction.fulfilled, (state, action) => {
+          state.markersData = action.payload;
         });
     }
     

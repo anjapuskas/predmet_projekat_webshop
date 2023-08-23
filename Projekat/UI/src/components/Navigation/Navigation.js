@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppBar, Toolbar, IconButton, Menu, MenuItem, ListItemIcon, Divider, Typography } from '@mui/material';
 import { AccountCircle, Logout, AddBox, ViewList, ViewStream, People } from '@mui/icons-material';
+import MapIcon from '@mui/icons-material/Map';
+
 import { useNavigate } from 'react-router-dom';
 import { logout } from 'slices/userSlice';
 import styles from './Navigation.module.css';
@@ -73,6 +75,10 @@ const Navigation = () => {
     navigate('/cart');
   };
 
+  const handleMapClick = () => {
+    navigate('/map');
+  };
+
   const handleLogoutClick = () => {
     dispatch(logout());
     dispatch(removeFromCart());
@@ -139,6 +145,16 @@ const Navigation = () => {
                 <ViewStream />
                 <Typography variant="body1" component="span">
                   New Orders
+                </Typography>
+              </IconButton>
+            </div>
+          )}
+          {isSeller && (
+            <div style={{padding: 1}}>
+              <IconButton edge="start" color="inherit" onClick={handleMapClick}>
+                <MapIcon />
+                <Typography variant="body1" component="span">
+                  Map
                 </Typography>
               </IconButton>
             </div>
