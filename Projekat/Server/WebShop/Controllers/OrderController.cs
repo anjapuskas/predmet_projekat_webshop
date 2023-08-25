@@ -74,7 +74,7 @@ namespace WebShop.Configuration
             return Ok(products);
         }
 
-        [HttpPost("approve/{id}")]
+        [HttpPut("approve/{id}")]
         [Authorize(Roles = "SELLER")]
         public async Task<IActionResult> approveOrder(long id)
         {

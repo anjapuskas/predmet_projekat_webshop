@@ -18,7 +18,6 @@ const MapForm = () => {
       iconSize: [35, 35]
     });
     const position = [45.261330846985175, 19.840184400392857];
-    const [ordersPositions, setOrdersPositions] = useState([]);
     const markersData = useSelector((state) => state.order.markersData);
 
 

@@ -223,7 +223,7 @@ const CartForm = () => {
                           return actions.order
                             ?.capture()
                             .then(() => {
-                              toast.success('Registration successful', {
+                              toast.success('Payment successful', {
                                 position: "top-center",
                                 autoClose: 2500,
                                 closeOnClick: true,

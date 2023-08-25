@@ -65,7 +65,7 @@ export const GetProductsForOrder = async (id) => {
 
 export const ApproveOrderAction = async (id) => {
     try {
-        const response = await axiosInstance.post(`${process.env.REACT_APP_BACKEND_APPLICATION_ENDPOINT}/orders/approve/${id}`);
+        const response = await axiosInstance.put(`${process.env.REACT_APP_BACKEND_APPLICATION_ENDPOINT}/orders/approve/${id}`);
         return response.data;
     } catch (error) {
      throw new Error(error.response.data.error);
